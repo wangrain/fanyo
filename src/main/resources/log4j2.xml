@@ -3,7 +3,7 @@
 <configuration status="OFF">
 	<!-- 定义下面的引用名 -->
 	<Properties>
-		<property name="log_pattern">[fanyo] %x %-5level %d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %class{36}.%M(%L) | %msg%xEx%n</property>
+		<property name="log_pattern">[fanyo]  %-5level %d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %class{36}.%M(%L) | %msg%xEx%n</property>
 		<property name="file_dir">..//logs//</property>
 		<property name="output_log_level">debug</property><!-- 日志输出级别 -->
 		<property name="file_prefix">fanyo_</property>

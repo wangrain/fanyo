@@ -6,7 +6,7 @@
 
     <groupId>fanyo</groupId>
     <artifactId>fanyo</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version></version>
     <packaging>war</packaging>
 
 

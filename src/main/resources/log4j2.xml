@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- status="OFF"，可以去掉，它的含义为是否记录log4j2本身的event信息，默认是OFF -->
+<configuration status="OFF">
+	<!-- 定义下面的引用名 -->
+	<Properties>
+		<property name="log_pattern">[fanyo] %x %-5level %d{yyyy-MM-dd HH:mm:ss,SSS} [%t] %class{36}.%M(%L) | %msg%xEx%n</property>
+		<property name="file_dir">..//logs//</property>
+		<property name="output_log_level">debug</property><!-- 日志输出级别 -->
+		<property name="file_prefix">fanyo_</property>
+	</Properties>
+
+	<!--先定义所有的appender -->
+	<appenders>
+		<!--这个输出控制台的配置 -->`
+		<Console name="Console" target="SYSTEM_OUT">
+			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
+			<ThresholdFilter level="all" onMatch="ACCEPT"
+				onMismatch="DENY" />
+			<!--这个都知道是输出日志的格式 -->
+			<PatternLayout pattern="${log_pattern}" />
+		</Console>
+
+
+		<!-- 重要的是，如果有多个ThresholdFilter，那么Filters是必须的，同时在Filters中，首先要过滤不符合的日志级别，把不需要的首先DENY掉，然后再ACCEPT需要的日志级别，这个次序不能搞颠倒。 -->
+
+		<!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档 -->
+		<!-- 按日生成归档日志 -->
+		<!-- 显示INFO级别的信息 -->
+		<RollingFile name="INFO_LOG" fileName="${file_dir}/${file_prefix}info.log"
+			filePattern="${file_dir}/${file_prefix}info.log.%d{yyyy-MM-dd}.txt">
+			<PatternLayout pattern="${log_pattern}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<Filters>
+				 <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>  
+                 <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/> 
+
+			</Filters>
+		</RollingFile>
+
+		<!--如果需要配置多个Rollingfile地址，还需要在root下添加appender-ref ref="ERR_LOG"/> 只显示error级别的信息 -->
+		<RollingFile name="ERROR_LOG" fileName="${file_dir}/${file_prefix}error.log"
+			filePattern="${file_dir}/${file_prefix}error.log.%d{yyyy-MM-dd}.txt">
+			<PatternLayout
+				pattern="${log_pattern}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<Filters>
+				<ThresholdFilter level="error" onMatch="ACCEPT"
+					onMismatch="DENY" />
+			</Filters>
+		</RollingFile>
+		<RollingFile name="DEBUG_LOG" fileName="${file_dir}/${file_prefix}debug.log"
+			filePattern="${file_dir}/${file_prefix}debug.log.%d{yyyy-MM-dd}.txt">
+			<PatternLayout
+				pattern="${log_pattern}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<Filters>
+				<ThresholdFilter level="info" onMatch="DENY" onMismatch="NEUTRAL"/>  
+                <ThresholdFilter level="debug" onMatch="ACCEPT" onMismatch="NEUTRAL"/>  
+
+			</Filters>
+		</RollingFile>
+		<RollingFile name="WARN_LOG" fileName="${file_dir}/${file_prefix}warn.log"
+			filePattern="${file_dir}/${file_prefix}warn.log.%d{yyyy-MM-dd}.txt">
+			<PatternLayout
+				pattern="${log_pattern}" />
+			<Policies>
+				<TimeBasedTriggeringPolicy modulate="true"
+					interval="1" />
+			</Policies>
+			<Filters>
+				<ThresholdFilter level="error" onMatch="DENY" onMismatch="NEUTRAL"/>  
+			   	<ThresholdFilter level="warn" onMatch="ACCEPT" onMismatch="DENY"/> 
+			</Filters>
+		</RollingFile>
+	</appenders>
+	<!--然后定义logger，只有定义了logger并引入的appender，appender才会生效 -->
+	<loggers>
+		<logger name="org" level="error" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="net" level="error" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.apache" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.hibernate" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+	
+		<logger name="org.springframework.web" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.springframework" level="error" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.springframework.jdbc.core" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.displaytag" level="error" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="com.mchange.v2" level="error" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="com.danga.MemCached" level="error" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="java.sql" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.mybatis" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.apache.ibatis" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.springframework.transaction" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="org.springframework.cache.ehcache" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="net.sf.ehcache" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="com.msds" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="java.sql.ResultSet" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="java.sql.Connection" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="java.sql.Statement" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger>
+		<logger name="java.sql.PreparedStatement" level="debug" additivity="false">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</logger> 
+		
+        
+		<!--建立一个默认的root的logger，需要在root的level中指定输出的级别， -->
+		<root level="${output_log_level}">
+			<appender-ref ref="DEBUG_LOG" />
+			<appender-ref ref="INFO_LOG" />
+			<appender-ref ref="WARN_LOG" />
+			<appender-ref ref="ERROR_LOG" />
+			<appender-ref ref="Console" />
+		</root>
+
+	</loggers>
+</configuration>
